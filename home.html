@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Reservation System - Home</title>
+    <link rel="stylesheet" href="static\styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, {{ username }}!</h2>
+        <p>Successfully logged in.</p>
+        
+        <form action="/search" method="GET" class="search-form" id="search-form">
+            <label for="train-search">Search Trains:</label>
+            <input type="text" id="train-search" name="query" placeholder="Enter train name or number">
+            <button type="submit">Search</button>
+        </form>
+
+        <div id="search-results">
+            <!-- Search results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // JavaScript code to handle search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('search-form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const query = document.getElementById('train-search').value;
+                // Send an AJAX request to the server for search
+                fetch(`/search?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle the search results here
+                        const searchResultsDiv = document.getElementById('search-results');
+                        searchResultsDiv.innerHTML = ''; // Clear previous search results
+                        if (data.length > 0) {
+                            // If there are search results, create HTML elements to display them
+                            const ul = document.createElement('ul');
+                            data.forEach(train => {
+                                const li = document.createElement('li');
+                                li.textContent = `${train.name} - ${train.number}, from ${train.source} to ${train.destination}`;
+                                ul.appendChild(li);
+                            });
+                            searchResultsDiv.appendChild(ul);
+                        } else {
+                            // If no search results found, display a message
+                            const message = document.createElement('p');
+                            message.textContent = 'No trains found matching the search criteria.';
+                            searchResultsDiv.appendChild(message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
